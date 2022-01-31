@@ -78,15 +78,15 @@ Klist <- list(K0)
 
 
 # construct nonlinear bases
-sm1 <- smoothCon(s(ncountryn, k=10+2,bs="ps", m=2), absorb.cons=T, data=data, sparse.cons = 1, scale.penalty=F)
+sm1 <- smoothCon(s(ncountryn, k=10+2,bs="ps"), absorb.cons=TRUE, data=data)
 B1 <- sm1[[1]]$X
 K1 <- sm1[[1]]$S[[1]]
 
-sm2 <- smoothCon(s(yearn,k=10+2,bs="ps", m=2), absorb.cons=T, data=data, sparse.cons = 1, scale.penalty=F)
+sm2 <- smoothCon(s(yearn,k=10+2,bs="ps"), absorb.cons=TRUE, data=data)
 B2 <- sm2[[1]]$X
 K2 <- sm2[[1]]$S[[1]]
 
-sm3 <- smoothCon(s(nclaimsn,k=10+2,bs="ps", m=2), absorb.cons=T, data=data, sparse.cons =1, scale.penalty=F)
+sm3 <- smoothCon(s(nclaimsn,k=10+2,bs="ps"), absorb.cons=TRUE, data=data)
 B3 <- sm3[[1]]$X
 K3 <- sm3[[1]]$S[[1]]
 
@@ -161,7 +161,7 @@ xx <- list(Xzero=Xzero, Xrest=Xrest, Xlrest=Xlrest,S= S, Klist=Klist, zero_ind =
 
 
 # NUTS settings
-settings <- list(max_treedepth=10, adapt_delta=0.99)
+settings <- list(max_treedepth=12, adapt_delta=0.8)
 its <- 2000
 warmup <- burnin <- its/2
 
@@ -170,11 +170,10 @@ fit <-NUTS(n_iter=its, xx=xx, f=posterior, gr=gradf, ll=ll, start=start, warmup=
 
 load("processed_data/patent_nl.RData")
 
-# Final acceptance ratio=0.98, and target=0.99
-# Final step size=0.022; after 1000 warmup iterations
-# Elapsed Time: 2811.9 seconds (Warmup)
-# Elapsed Time: 2077.4 seconds (Sampling)
-# Elapsed Time: 4889.3 seconds (Total)
+# Final step size=0.129; after 1000 warmup iterations
+# Elapsed Time: 523.0 seconds (Warmup)
+# Elapsed Time: 422.0 seconds (Sampling)
+# Elapsed Time: 945.0 seconds (Total)
 beta_samples <- fit$beta
 
 effectiveSize(beta_samples %>% as.mcmc)
