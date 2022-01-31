@@ -1,4 +1,4 @@
-# Complete code for the application
+# Complete code to reproduce the applications
 Bayesian discrete conditional transformation models (BDCTMs) provide an overarching model framework for situations where e.g. count hurdle or (non-)proportional odds models with nonlinear (interaction) effects is due. Inference via MCMC is based on the No-U-Turn sampler.
 ##  [Patent citations](patent)
 **Nonlinear transformation model of patent citation counts with possibly nonlinear hurdle effects at zero.**
