@@ -1,7 +1,7 @@
 ##
-## Script name: forest.R
+## Script name: forest_npo_spat_re.R
 ##
-## Purpose of script: estimates discrete BDCTM in form of a partial proportional odds model for forest health data with spatial tensor spline and random effectn
+## Purpose of script: estimates discrete BDCTM in form of a partial proportional odds model for forest health data with spatial tensor spline and random effect on tree location ids
 ##
 ## Author: Manuel Carlan
 ##
@@ -21,7 +21,7 @@ packages <- c("MASS","BayesX", "Rcpp", "RcppArmadillo", "splines", "mgcv", "Matr
               "R2BayesX", "tidyverse", "profvis", "numDeriv", "scales", 
               "doParallel", "scam", "mvtnorm", "MCMCpack", "rlist", "RhpcBLASctl")# library(doParallel)
 
-setwd("D:/OneDrive/bdctm_paper/")
+#setwd("D:/OneDrive/bdctm_showcase/")
 lapply(packages, library, character.only = TRUE) %>%  invisible()
 
 
@@ -217,7 +217,7 @@ burnin=its/2
 
 # starting values
 start <- rep(0, p)
-fit <-NUTS(n_iter=its, xx=xx, f=posterior_logitd3, gr=gradf_logitd3, ll=ll_logitd3, fixed=fixed, start=start, warmup=warmup, nuts_settings=settings)
+fit <-NUTS(n_iter=its, burnin=burnin, xx=xx, f=posterior_logitd3, gr=gradf_logitd3, ll=ll_logitd3, fixed=fixed, start=start, warmup=warmup, nuts_settings=settings)
 
 # first order differences:
 # Final acceptance ratio=0.88, and target=0.9
@@ -237,11 +237,15 @@ fit <-NUTS(n_iter=its, xx=xx, f=posterior_logitd3, gr=gradf_logitd3, ll=ll_logit
 # save(fit, file="processed_data/forest_npo_re_spat.RData")
 
 # load("processed_data/forest_npo_re_spat.RData")
+
+# results for first order differences
+# load("processed_data/forest_npo_id_re_spat_omega_ig_m1_10000it.RData")
+# results for 2nd order differences
 load("processed_data/forest_npo_id_re_spat_omega_ig_m2_10000it.RData")
 
 library(mcmcplots)
 
-beta_samples <- fit$beta[1000:10000,]
+beta_samples <- fit$beta[5000:10000,]
 colnames(beta_samples) <- colnames(xx$Xnew)
 # mcmcplot(beta_samples)
 tau2_samples <- fit$tau[,1:3]
@@ -279,15 +283,15 @@ pred_spat <- PredictMat(smspat, pred_grid)%*% beta_spat
 gg_spat <- data.frame(pred_spat, pred_grid)
 
 spat_plot <- ggplot( data=gg_spat) + geom_tile(aes(x=x_s, y=y_s, fill=pred_spat))  + 
-  geom_point(aes(x_s, y_s), data=data, shape=2, size=5) +
-  scale_fill_viridis_c(option="A", name="h(y,x)", direction=-1, begin=0.1, end=1) +
+  geom_point(aes(x_s, y_s), data=data, shape=2, size=5, colour="darkgreen", stroke = 2) +
+  scale_fill_viridis_c(option="A", name="h(y,x)", direction=-1, begin=0.1, end=0.9) +
   theme_void() +
   expand_limits(x=0, y=0) 
 
 spat_plot
 
 
-# ggsave("figures/forest_spat_m2.png", plot=spat_plot, width=10)
+# ggsave("figures/forest_spat_m2.png", plot=spat_plot, width=10, height=6)
 
 
 #############################
